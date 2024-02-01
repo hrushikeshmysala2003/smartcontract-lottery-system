@@ -79,7 +79,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
     // 4.The lottery should be in an open state
     function checkUpkeep(
         bytes memory /*checkData*/
-    ) public view override returns (bool upkeepNeeded, bytes memory /*performData*/) {
+    ) public override returns (bool upkeepNeeded, bytes memory /*performData*/) {
         bool isOpen = (RaffleState.OPEN == s_raffleState);
         bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
         bool hasPlayers = (s_players.length > 0);
@@ -117,6 +117,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
         s_recentWinner = recentWinner;
         s_raffleState = RaffleState.OPEN;
         s_players = new address payable[](0);
+        s_lastTimeStamp = block.timestamp;
         (bool success, ) = recentWinner.call{value: address(this).balance}("");
         if (!success) {
             revert Raffle__TransferFailed();
@@ -135,5 +136,25 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
 
     function getRecentWinner() public view returns (address) {
         return s_recentWinner;
+    }
+
+    function getRaffleState() public view returns (RaffleState) {
+        return s_raffleState;
+    }
+
+    function getNumWords() public pure returns (uint32) {
+        return numWords;
+    }
+
+    function getNumberOfPlayers() public view returns (uint256) {
+        return s_players.length;
+    }
+
+    function getLatestTimeStamp() public view returns (uint256) {
+        return s_lastTimeStamp;
+    }
+
+    function getRequestConfirmations() public pure returns (uint256) {
+        return requestConfirmations;
     }
 }
