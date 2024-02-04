@@ -62,6 +62,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatible {
 
     function enterRaffle() public payable {
         // msg.value > entrance fee
+        // require(msg.value > i_entranceFee, "You need to spend more ETH!");
         if (msg.value < i_entranceFee) {
             revert Raffle__NotEnoughETHEntered();
         }

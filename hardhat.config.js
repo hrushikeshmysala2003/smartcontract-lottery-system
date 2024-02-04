@@ -1,9 +1,10 @@
-require("@nomiclabs/hardhat-waffle")
 require("hardhat-deploy")
+require("@nomicfoundation/hardhat-chai-matchers")
 require("@nomicfoundation/hardhat-verify")
 require("solidity-coverage")
 require("hardhat-gas-reporter")
 require("hardhat-contract-sizer")
+require("hardhat-deploy-ethers")
 require("dotenv").config()
 
 /** @type import('hardhat/config').HardhatUserConfig */
