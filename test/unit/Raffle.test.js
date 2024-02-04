@@ -6,13 +6,15 @@ const { assert, expect } = require("chai")
     ? describe.skip
     : describe("Raffle Unit Tests", async function () {
           let raffle, vrfCoordinatorV2Mock, raffleEntranceFee
-          let chainId
+          let chainId, deployer
           beforeEach(async function () {
               const { deployer } = await getNamedAccounts()
+
               await deployments.fixture(["all"])
               raffle = await ethers.getContract("Raffle", deployer)
               vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock", deployer)
               chainId = network.config.chainId
+              raffleEntranceFee = await raffle.getEntranceFee()
           })
 
           describe("contructor", async function () {
@@ -29,6 +31,21 @@ const { assert, expect } = require("chai")
                   await expect(raffle.enterRaffle()).to.be.revertedWithCustomError(
                       raffle,
                       "Raffle__NotEnoughETHEntered",
+                  )
+              })
+
+              it("records players when they enter", async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+                  const playerFromContract = await raffle.getPlayer(0)
+                  console.log(playerFromContract)
+                  console.log(deployer)
+                  assert.equal(playerFromContract, deployer)
+              })
+
+              it("emits event on enter", async function () {
+                  await expect(raffle.enterRaffle({ value: raffleEntranceFee })).to.emit(
+                      raffle,
+                      "RaffleEnter",
                   )
               })
           })
